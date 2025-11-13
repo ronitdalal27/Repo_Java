@@ -1,0 +1,94 @@
+AWS RDS and EC2
+
+RDS -
+Question 1
+Create an RDS MySQL instance (db.t3.micro) in us-east-1.
+No backup retention, no auto-scaling, no read replica.
+Tag with (name), (project) – mysql-lab-01, (roll_no), (date).
+Enable public access and connect via MySQL Workbench.
+Import classicmodels.sql from the dataset.
+Export as classicmodels_export_01.sql .
+Create S3 bucket rollno-bucket-01 in us-east-1, upload export, and download it.
+Tag bucket with (name, roll_no, project, date, teacher_name).
+Take screenshots and upload to Google Doc.
+
+ANS-
+STEP 1: Login to https://aws.amazon.com/console/
+On the top right, ensure your region is set to US East (N. Virginia) → this is us-east-1.
+
+STEP 2: Create a MySQL RDS Database -> In the AWS console search bar, type RDS and click RDS. -> On the left sidebar, click Databases → then click Create database. -> Under “Choose a database creation method”, select Standard create. -> Under “Engine options”: -> Choose MySQL. -> Version: keep the default or the latest available.
+-> Under “Templates”, choose Free Tier. -> Scroll down to Settings: -> DB instance identifier: → mysql-lab-01 -> Master username: → admin -> Master password: → create one (e.g., Admin@1234) -> Confirm password: → re-enter ->
+Scroll to DB instance class: -> Choose db.t3.micro. -> Scroll to Storage: -> Keep default, but uncheck “Enable storage autoscaling”. -> Scroll to Connectivity: -> Virtual Private Cloud (VPC): leave default. -> Public access: → Select Yes -> VPC security group: choose Create new security group (we’ll edit it later). -> Scroll to Additional configuration: -> Initial database name → type: classicmodels -> Backup retention period → set to 0 days (this disables automatic backups) -> Uncheck any performance insights or monitoring options. -> Scroll to Tags: -> Add the following tags: 
+Key: name → Value: YourName , Key: project → Value: mysql-lab-01 , Key: roll_no → Value: YourRollNo, Key: date → Value: 07-11-2025 ->Click Create database at the bottom.
+
+STEP 3: Allow Your Computer to Access the Database -> When your DB is ready: -> Click on your database name (mysql-lab-01). -> Scroll down to Connectivity & security. -> Note your Endpoint (looks like: mysql-lab-01.xxxxxx.us-east-1.rds.amazonaws.com) — copy it. -> Scroll further to VPC security groups, click the link of your security group (it will open EC2 console). -> Click Edit inbound rules. -> Click Add rule: -> Type → MYSQL/Aurora -> Port → 3306 -> Source → My IP (this will automatically add your system’s IP) -> Click Save rules. Now your local system can connect to your RDS database.
+
+STEP 4: Connect Using MySQL Workbench -> Download MySQL Workbench -> Open Workbench → click the ‘+’ icon beside MySQL Connections. -> Enter: Connection Name: mysql-lab-01 Hostname: <paste your RDS endpoint> Port: 3306 Username: admin -> Click Store in Vault... → enter your password (the one you set earlier). -> Click Test Connection → It should show “Connection Successful”.
+-> Click OK → then double-click your connection to open it.
+
+STEP 5: Import the Dataset (classicmodels.sql) -> Download dataset from here: https://www.mysqltutorial.org/wp-content/uploads/2023/10/mysqlsampledatabase.zip -> Extract the ZIP → you’ll get a file named classicmodels.sql. -> In MySQL Workbench: Click on your connection (mysql-lab-01). -> Click Server → Data Import. -> Select Import from Self-Contained File → choose the classicmodels.sql file. -> Choose your target schema: classicmodels. -> Click Start Import. -> Wait until it says Import completed. -> You’ve now loaded the sample data into your RDS MySQL instance.
+
+STEP 6: Export Database to a File -> In Workbench → Click Server → Data Export. -> Select your classicmodels database. -> Choose “Export to Self-Contained File”. -> File name: classicmodels_export_01.sql -> Click Start Export. -> After it’s done, check your file in your local system.
+
+STEP 7: Create an S3 Bucket and Upload the File -> In AWS Console → Search for S3 → open it. -> Click Create bucket. Enter: -> Bucket name: yourrollno-bucket-01 (example: 23mca004-bucket-01) -> Region: US East (N. Virginia) -> Keep Block all public access = ON. -> Scroll to the bottom → click Create bucket. -> Open your new bucket → click Upload. -> Add files → select your exported file classicmodels_export_01.sql. -> Click Upload. -> Your export file is now stored in S3.
+
+STEP 8: Download the File Back -> Go to your S3 bucket → click on the file → click Download. -> The file will be saved on your computer again — this proves upload/download works.
+
+STEP 9: Tag the S3 Bucket -> Inside your bucket: -> Go to Properties → scroll to Tags → click Edit. -> Add the following tags: name: YourName, project: mysql-lab-01, roll_no: YourRollNo,
+date: 07-11-2025, teacher_name: YourTeacherName -> Click Save changes.
+
+STEP 10: Take Screenshots
+
+
+Q2
+Ans :-
+AWS EC2 Setup Guide for Windows (Cloud-Intro Project)
+
+1. Log in to AWS Console
+
+2. Create a Key Pair -> Go to EC2 Dashboard → Key Pairs (left sidebar) -> Click Create Key Pair -> Name it exactly as your roll_number (e.g., 2401036) -> Choose Key type: RSA -> Choose Private key format: .pem -> Click Create Key Pair -> The .pem file will download automatically — save it in C:\Users\hp\Downloads
+
+3. Launch EC2 Instance
+- Go to EC2 Dashboard → Click Launch Instance -> Fill in the following: -> name(ronit), ami(ubuntu), instance type(t2.micro), key pair(2401036), network setting click edit
+
+4. Configure Security Group -> Inbound rules: Remove default SSH rule -> Add new rule: -> Type: SSH -> Protocol: TCP -> Port Range: 22 -> Source: My IP (or your institution’s IP range)
+- This ensures it's not open to 0.0.0.0/0
+
+5. Configure Storage -> Root volume: Change size to 10 GB -> Add new volume: -> Click Add New Volume -> Size: 8 GB -> Volume Type: General Purpose SSD (gp2) -> Device name: /dev/sdf
+
+6. Add Tags
+Click Add Tags and enter the following: -> Name, Project, Roll_No, Date, TeacherName with their values
+
+7. Launch Instance -> Click Launch Instance -> Wait for it to initialize -> Go to Instances → Select your instance → Click Connect
+
+8. SSH into Instance (Windows) -> Open PowerShell and run this command: -> ssh -i "C:\Users\hp\Downloads\2401036.pem" ubuntu@<your-ec2-public-ip> -> Replace <your-ec2-public-ip> with the Public IPv4 address shown in your EC2 instance details.
+
+9. Verify SSH Login -> Once logged in, you’ll see something like: -> Welcome to Ubuntu 22.04.3 LTS (GNU/Linux 5.15.0-1031-aws x86_64) -> ubuntu@ip-172-31-16-139:~$ -> This confirms successful login. Take a screenshot of this terminal window
+
+10. Take Screenshots
+
+Q3. Generic Instruction:
+Each student must complete one assigned question.
+You are required to deploy, run, migrate, and demonstrate the chosen application on both Windows and Linux (VirtualBox) environments.
+Students are free to choose any open-source project from GitHub that fits the technology stack mentioned in the question.
+Refer to the respective GitHub repository’s documentation for setup and deployment instructions.
+Take screenshots for each step and upload all screenshots to a Google Doc.
+Choose a Java Maven web project.
+1. Place files in C:\java_lab14.
+2. Deploy and show to the examiner. Take screenshots.
+3. Move project to /home/student/java_lab14/ and deploy on Linux.
+4. Take screenshots of both deployments and upload.
+
+Ans:-
+step1 :- git clone https://github.com/heroku/java-getting-started.git -> cd java-getting-started -> mvn clean package -> If Maven is not installed: -> .\mvnw.cmd clean package -> java -jar target\java-getting-started-1.0.0-SNAPSHOT.jar  -> on browser run http://localhost:5000
+
+step2 :- open virtual machine -> ubuntu login -> open terminal -> sudo apt update -> sudo apt install -y openjdk-17-jdk maven git -> java -version -> mvn -version -> git --version
+
+step3 :- cd /home/ubuntu_account_name  -> git clone https://github.com/heroku/java-getting-started.git -> cd java-getting-started -> mvn clean package -> java -jar target/java-getting-started-1.0.0-SNAPSHOT.jar
+
+Step4 :- Open Browser in Ubuntu -> Open Firefox or Chrome in Ubuntu: -> http://localhost:5000
+
+
+
+
+
